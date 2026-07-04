@@ -53,6 +53,7 @@ type Brand = {
   signature: string
   pieces: string[]
   bestFor: Occasion[]
+  paletteName: string
   palette: string[]
   source: string
 }
@@ -106,6 +107,7 @@ const brands: Brand[] = [
     signature: '功能、基础款和趋势单品混合，适合日常快速出门。',
     pieces: ['轻外套', '基础 T 恤', '直筒裤', '舒适运动鞋'],
     bestFor: ['work', 'campus', 'date', 'sport', 'outdoor'],
+    paletteName: '炭黑 + 鼠尾草绿',
     palette: ['#202225', '#6e8b7c', '#e46f57', '#f2c66d'],
     source: 'local',
   },
@@ -117,6 +119,7 @@ const brands: Brand[] = [
     signature: 'Dri-FIT、Sportswear、Windrunner 和 Tech Fleece 适合做运动街头底盘。',
     pieces: ['Dri-FIT 上衣', 'Windrunner 外套', 'Tech Fleece 长裤', '运动鞋'],
     bestFor: ['campus', 'sport', 'outdoor'],
+    paletteName: '炭黑 + 番茄红',
     palette: ['#111111', '#f5f5f0', '#f15a3b', '#536d8f'],
     source: 'https://www.nike.com/w/mens-clothing-6ymx6znik1',
   },
@@ -128,6 +131,7 @@ const brands: Brand[] = [
     signature: 'Originals 适合复古街头，Performance 适合训练和轻户外。',
     pieces: ['三条纹夹克', '运动卫衣', '针织运动裤', 'Samba / Gazelle 风格鞋'],
     bestFor: ['campus', 'sport', 'date'],
+    paletteName: '炭黑 + 运动蓝',
     palette: ['#0d0f13', '#f4f1e8', '#1b5fbf', '#65a86f'],
     source: 'https://www.adidas.com/us/clothing',
   },
@@ -139,6 +143,7 @@ const brands: Brand[] = [
     signature: 'AIRism、针织、衬衫和轻外套适合干净、耐穿的日常搭配。',
     pieces: ['AIRism 内搭', '牛津纺衬衫', '针织开衫', '感动裤 / 直筒裤'],
     bestFor: ['work', 'campus', 'date'],
+    paletteName: '炭黑 + 雾感青绿',
     palette: ['#232323', '#f7f1e8', '#9bb8ae', '#c94d3c'],
     source: 'https://www.uniqlo.com/us/en/contents/lifewear/',
   },
@@ -150,6 +155,7 @@ const brands: Brand[] = [
     signature: '西装、衬衫、廓形裤和季节色适合做更利落的城市风格。',
     pieces: ['短款夹克', '廓形衬衫', '西装裤', '乐福鞋'],
     bestFor: ['work', 'date'],
+    paletteName: '炭黑 + 焦糖棕',
     palette: ['#1f1f1f', '#faf7ef', '#9a6a51', '#d84e4b'],
     source: 'https://www.zara.com/',
   },
@@ -161,6 +167,7 @@ const brands: Brand[] = [
     signature: '基础 T、牛仔、针织和外套好组合，适合快速补齐衣橱。',
     pieces: ['罗纹背心', '牛仔外套', '宽松牛仔裤', '帆布鞋'],
     bestFor: ['campus', 'date', 'work'],
+    paletteName: '暖灰 + 番茄红',
     palette: ['#2b2d2f', '#fff8ea', '#c7473d', '#e2b85d'],
     source: 'https://www2.hm.com/en_us/index.html',
   },
@@ -172,6 +179,7 @@ const brands: Brand[] = [
     signature: '冲锋衣、抓绒、徒步裤和防水层适合雨天、风天和户外。',
     pieces: ['防水夹克', '抓绒中层', '徒步长裤', '户外鞋'],
     bestFor: ['outdoor', 'campus'],
+    paletteName: '炭黑 + 山系红',
     palette: ['#17191c', '#e8ece8', '#d43f34', '#6f8478'],
     source: 'https://www.thenorthface.com/en-us/mens',
   },
@@ -183,6 +191,7 @@ const brands: Brand[] = [
     signature: '运动裤、卫衣、跑步外套和复古鞋适合轻松但有型的日常。',
     pieces: ['复古运动鞋', '圆领卫衣', '梭织短裤', '跑步夹克'],
     bestFor: ['campus', 'sport'],
+    paletteName: '深海蓝 + 雾灰',
     palette: ['#1f2933', '#f2efe8', '#9fa7ae', '#d95043'],
     source: 'https://www.newbalance.com/men/clothing/',
   },
@@ -194,6 +203,7 @@ const brands: Brand[] = [
     signature: '技术面料、训练裤、上衣和轻外套适合运动后直接进日常。',
     pieces: ['训练 T 恤', '弹力长裤', '轻量连帽衫', '腰包'],
     bestFor: ['sport', 'work', 'campus'],
+    paletteName: '炭黑 + 鼠尾草绿',
     palette: ['#201d1f', '#f3eee6', '#7f8f7a', '#bb483c'],
     source: 'https://shop.lululemon.com/c/men-clothes/n1oxc7',
   },
@@ -205,6 +215,7 @@ const brands: Brand[] = [
     signature: '硬壳、软壳、保暖层和轻量单品适合天气复杂的一天。',
     pieces: ['硬壳夹克', '软壳裤', '保暖中层', '防水包'],
     bestFor: ['outdoor', 'work'],
+    paletteName: '炭黑 + 松针绿',
     palette: ['#111416', '#eef0e7', '#5f746b', '#f0a44d'],
     source: 'https://arcteryx.com/us/en/c/mens/jackets',
   },
@@ -216,6 +227,7 @@ const brands: Brand[] = [
     signature: 'HeatGear、ColdGear、训练短裤和卫衣适合高活动量日程。',
     pieces: ['速干训练上衣', '压缩内搭', '训练短裤', '抓地训练鞋'],
     bestFor: ['sport', 'outdoor'],
+    paletteName: '炭黑 + 钢蓝',
     palette: ['#151719', '#f7f3eb', '#5f7282', '#c43f3a'],
     source: 'https://www.underarmour.com/en-us/c/mens/clothing/',
   },
@@ -257,13 +269,6 @@ const commuteOptions: Array<{ id: Commute; label: string }> = [
   { id: 'transit', label: '地铁公交' },
   { id: 'bike', label: '骑行' },
   { id: 'drive', label: '开车' },
-]
-
-const paletteNames = [
-  '深海蓝 + 鼠尾草绿',
-  '奶油白 + 焦糖棕',
-  '炭黑 + 番茄红',
-  '雾灰 + 柠檬黄',
 ]
 
 const outfitVisuals: Record<Occasion, string> = {
@@ -556,7 +561,6 @@ function createOutfit(
 ): Outfit {
   const brand = pickBrand(selectedBrand, weather, occasion, temperature)
   const temperatureLook = getTemperatureLayers(temperature)
-  const paletteIndex = Math.abs(seed + variantIndex + temperature + brand.name.length) % paletteNames.length
   const genderPieces = getGenderPieces(gender, temperature, occasion, brand, seed + variantIndex)
   const essentials = [
     getEnvironmentEssential(temperature, weather, occasion, gender),
@@ -570,7 +574,7 @@ function createOutfit(
     layers: genderPieces,
     essentials,
     reason: `${getOccasionNotes(occasion, brand).join('；')}；${getGenderOccasionTip(gender, occasion)}`,
-    paletteName: paletteNames[paletteIndex],
+    paletteName: brand.paletteName,
     palette: brand.palette,
     brand,
     visual: outfitVisuals[visualOccasion],
