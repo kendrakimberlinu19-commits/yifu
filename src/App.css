@@ -763,6 +763,21 @@ select {
   color: var(--ink);
 }
 
+.piece-row.with-photo {
+  min-height: 74px;
+  padding: 8px 0;
+}
+
+.piece-row img {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border: 1px solid rgba(23, 25, 28, 0.08);
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+
 .piece-row svg {
   color: var(--sage);
   flex: 0 0 auto;

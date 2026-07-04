@@ -25,6 +25,14 @@ import outfitOffice from './assets/outfit-office.png'
 import outfitOutdoor from './assets/outfit-outdoor.png'
 import outfitSport from './assets/outfit-sport.png'
 import styleBoard from './assets/style-board.png'
+import casualBasicsPhoto from './assets/clothing/casual-basics.jpg'
+import crossbodyBagPhoto from './assets/clothing/crossbody-bag.jpg'
+import denimJacketPhoto from './assets/clothing/denim-jacket.jpg'
+import dressShoesSuitPhoto from './assets/clothing/dress-shoes-suit.jpg'
+import knitDenimSneakersPhoto from './assets/clothing/knit-denim-sneakers.jpg'
+import smartCasualShirtPhoto from './assets/clothing/smart-casual-shirt.jpg'
+import smartSweaterLoafersPhoto from './assets/clothing/smart-sweater-loafers.jpg'
+import sportKitPhoto from './assets/clothing/sport-kit.jpg'
 import { trackEvent } from './analytics'
 import './App.css'
 
@@ -92,6 +100,11 @@ type OpenMeteoCurrent = {
     wind_speed_10m?: number
     time?: string
   }
+}
+
+type ClothingPhoto = {
+  src: string
+  label: string
 }
 
 let hasTrackedInitialPageView = false
@@ -272,6 +285,17 @@ const outfitVisuals: Record<Occasion, string> = {
   date: outfitDate,
   sport: outfitSport,
   outdoor: outfitOutdoor,
+}
+
+const clothingPhotos: Record<string, ClothingPhoto> = {
+  outer: { src: denimJacketPhoto, label: '外套参考照片' },
+  top: { src: smartCasualShirtPhoto, label: '上衣参考照片' },
+  knit: { src: smartSweaterLoafersPhoto, label: '针织层参考照片' },
+  pants: { src: knitDenimSneakersPhoto, label: '裤装参考照片' },
+  shoes: { src: dressShoesSuitPhoto, label: '鞋履参考照片' },
+  sport: { src: sportKitPhoto, label: '运动单品参考照片' },
+  bag: { src: crossbodyBagPhoto, label: '包袋配饰参考照片' },
+  casual: { src: casualBasicsPhoto, label: '休闲基础款参考照片' },
 }
 
 const variantLabels = ['首选方案', '轻松替换', '天气备选']
@@ -634,6 +658,48 @@ function getLocationErrorMessage(error: GeolocationPositionError) {
   }
 
   return '自动天气获取失败，已保留手动天气设置。'
+}
+
+function getPiecePhoto(piece: string, index: number) {
+  const normalizedPiece = piece.toLowerCase()
+
+  if (/鞋|靴|sneaker|samba|gazelle|loafers/.test(normalizedPiece)) {
+    return clothingPhotos.shoes
+  }
+
+  if (/包|斜挎|腰包|背包|雨具|伞/.test(normalizedPiece)) {
+    return clothingPhotos.bag
+  }
+
+  if (/裤|裙|short|长裤|短裤|牛仔/.test(normalizedPiece)) {
+    return clothingPhotos.pants
+  }
+
+  if (/运动|训练|速干|dri-fit|heatgear|coldgear|压缩/.test(normalizedPiece)) {
+    return clothingPhotos.sport
+  }
+
+  if (/针织|开衫|抓绒|毛|卫衣|sweater|fleece/.test(normalizedPiece)) {
+    return clothingPhotos.knit
+  }
+
+  if (/外套|夹克|风衣|羽绒|派克|硬壳|软壳|jacket|coat|shell/.test(normalizedPiece)) {
+    return clothingPhotos.outer
+  }
+
+  if (/衬衫|t |t恤|t 恤|上衣|内搭|airism|背心|短袖|长袖|shirt|tee/.test(normalizedPiece)) {
+    return clothingPhotos.top
+  }
+
+  const fallbackOrder = [
+    clothingPhotos.casual,
+    clothingPhotos.top,
+    clothingPhotos.pants,
+    clothingPhotos.shoes,
+    clothingPhotos.bag,
+  ]
+
+  return fallbackOrder[index % fallbackOrder.length]
 }
 
 function App() {
@@ -1076,12 +1142,17 @@ function App() {
                 <h3>{set.headline}</h3>
                 <p>{set.mood}</p>
                 <div className="piece-list compact">
-                  {set.layers.slice(0, 5).map((piece) => (
-                    <div className="piece-row" key={piece}>
+                  {set.layers.slice(0, 5).map((piece, pieceIndex) => {
+                    const piecePhoto = getPiecePhoto(piece, pieceIndex)
+
+                    return (
+                    <div className="piece-row with-photo" key={piece}>
+                      <img src={piecePhoto.src} alt={piecePhoto.label} />
                       <Layers size={17} />
                       <span>{piece}</span>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
                 <div className="outfit-card-actions">
                   <button

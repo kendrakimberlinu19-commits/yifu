@@ -114,6 +114,19 @@ npm run preview
 
 当前版本使用项目内原创穿搭图，避免未经授权抓取或盗链品牌官网图片。
 
+单品参考照片来自 Unsplash 免费图库，已下载到项目本地 `src/assets/clothing`，用于展示服装类别参考，不代表具体品牌官方商品。
+
+当前使用的照片来源：
+
+- https://unsplash.com/photos/white-crew-neck-t-shirt-and-brown-leather-boots-gUPiTDBdRe4
+- https://unsplash.com/photos/gray-sweater-blue-jeans-and-pair-of-shoes-FSGscXKUmHg
+- https://unsplash.com/photos/clothing-apparel-and-person-wfbvJzO6SpQ
+- https://unsplash.com/photos/white-black-red-and-brown-leather-shoulder-bag-H8wI54o8mY4
+- https://unsplash.com/photos/blue-denim-button-up-jacket-jAgTju69gq4
+- https://unsplash.com/photos/black-leather-dress-shoes-c-HC6S2rSCc
+- https://unsplash.com/photos/black-white-and-brown-plaid-textile-with-white-textile-C0d4T6SS8r4
+- https://unsplash.com/photos/blue-denim-jeans-brown-leather-loafers-and-gray-knit-sweater-_nEVk0WqGVI
+
 如果后续要接真实商品照片，推荐使用：
 
 - 品牌官方 API 或授权商品 feed。
