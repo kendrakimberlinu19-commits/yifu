@@ -302,7 +302,7 @@ const clothingPhotoGroups = {
   outer: [
     { src: denimJacketPhoto, label: '外套参考照片' },
     { src: outfitBlazerJeansShoesPhoto, label: '西装外套参考照片' },
-    { src: outfitTravelHatSandalsPhoto, label: '户外外层参考照片' },
+    { src: outfitSuitBrownShoesPhoto, label: '套装外套参考照片' },
   ],
   top: [
     { src: smartCasualShirtPhoto, label: '衬衫参考照片' },
@@ -318,6 +318,7 @@ const clothingPhotoGroups = {
     { src: knitDenimSneakersPhoto, label: '裤装参考照片' },
     { src: denimFlowerJeansPhoto, label: '牛仔裤参考照片' },
     { src: outfitConverseDenimPhoto, label: '休闲裤装参考照片' },
+    { src: outfitBlazerJeansShoesPhoto, label: '牛仔裤搭配参考照片' },
   ],
   shoes: [
     { src: dressShoesSuitPhoto, label: '皮鞋参考照片' },
@@ -329,12 +330,15 @@ const clothingPhotoGroups = {
   sport: [
     { src: sportKitPhoto, label: '运动装备参考照片' },
     { src: outfitBlackShirtSneakersPhoto, label: '训练装备参考照片' },
-    { src: shoesRetailWallPhoto, label: '运动鞋参考照片' },
   ],
   bag: [
     { src: crossbodyBagPhoto, label: '包袋参考照片' },
     { src: outfitTravelHatSandalsPhoto, label: '出行配饰参考照片' },
     { src: outfitTravelHatSandalsPhoto, label: '夏日配饰参考照片' },
+  ],
+  accessory: [
+    { src: outfitTravelHatSandalsPhoto, label: '帽子配饰参考照片' },
+    { src: casualBasicsPhoto, label: '日常配饰参考照片' },
   ],
   casual: [
     { src: casualBasicsPhoto, label: '休闲基础款参考照片' },
@@ -342,27 +346,6 @@ const clothingPhotoGroups = {
     { src: outfitWomensAssortedPhoto, label: '日常搭配参考照片' },
   ],
 } satisfies Record<string, ClothingPhoto[]>
-
-const brandPhotoGroups = {
-  nike: [sportKitPhoto, shoesColorWallPhoto, outfitBlackShirtSneakersPhoto, shoesRetailWallPhoto],
-  adidas: [outfitConverseDenimPhoto, shoesColorWallPhoto, sportKitPhoto, outfitBlackShirtSneakersPhoto],
-  uniqlo: [smartCasualShirtPhoto, casualBasicsPhoto, smartSweaterLoafersPhoto, outfitWomensAssortedPhoto],
-  zara: [outfitBlazerJeansShoesPhoto, outfitSuitBrownShoesPhoto, dressShoesSuitPhoto, smartSweaterLoafersPhoto],
-  hm: [outfitWomensAssortedPhoto, denimFlowerJeansPhoto, casualBasicsPhoto, crossbodyBagPhoto],
-  thenorthface: [outfitTravelHatSandalsPhoto, shoesRocksAutumnPhoto, denimJacketPhoto, crossbodyBagPhoto],
-  newbalance: [shoesNewBalanceBoxPhoto, knitDenimSneakersPhoto, shoesRetailWallPhoto, outfitConverseDenimPhoto],
-  lululemon: [sportKitPhoto, outfitBlackShirtSneakersPhoto, crossbodyBagPhoto, smartCasualShirtPhoto],
-  arcteryx: [outfitTravelHatSandalsPhoto, shoesRocksAutumnPhoto, denimJacketPhoto, outfitBlackShirtSneakersPhoto],
-  underarmour: [sportKitPhoto, outfitBlackShirtSneakersPhoto, shoesColorWallPhoto, shoesRetailWallPhoto],
-  smart: [casualBasicsPhoto, smartCasualShirtPhoto, knitDenimSneakersPhoto, crossbodyBagPhoto],
-} satisfies Record<BrandId, string[]>
-
-const allClothingPhotos = [
-  ...Object.values(clothingPhotoGroups).flat(),
-  ...Object.values(brandPhotoGroups)
-    .flat()
-    .map((src) => ({ src, label: '服装单品参考照片' })),
-]
 
 const variantLabels = ['首选方案', '轻松替换', '天气备选']
 
@@ -733,12 +716,20 @@ function getPiecePhotoGroup(piece: string) {
     return 'shoes'
   }
 
+  if (/帽|墨镜/.test(normalizedPiece)) {
+    return 'accessory'
+  }
+
   if (/包|斜挎|腰包|背包|雨具|伞/.test(normalizedPiece)) {
     return 'bag'
   }
 
   if (/裤|裙|short|长裤|短裤|牛仔/.test(normalizedPiece)) {
     return 'pants'
+  }
+
+  if (/衬衫|t |t恤|t 恤|上衣|内搭|airism|背心|短袖|长袖|shirt|tee/.test(normalizedPiece)) {
+    return 'top'
   }
 
   if (/运动|训练|速干|dri-fit|heatgear|coldgear|压缩/.test(normalizedPiece)) {
@@ -751,10 +742,6 @@ function getPiecePhotoGroup(piece: string) {
 
   if (/外套|夹克|风衣|羽绒|派克|硬壳|软壳|jacket|coat|shell/.test(normalizedPiece)) {
     return 'outer'
-  }
-
-  if (/衬衫|t |t恤|t 恤|上衣|内搭|airism|背心|短袖|长袖|shirt|tee/.test(normalizedPiece)) {
-    return 'top'
   }
 
   return 'casual'
@@ -784,12 +771,10 @@ function getUniquePhotos(photos: ClothingPhoto[]) {
 
 function getPiecePhotoCandidates(piece: string, brandId: BrandId) {
   const group = getPiecePhotoGroup(piece)
-  const brandPhotos = brandPhotoGroups[brandId].map((src) => ({
-    src,
-    label: `${brandId} 单品参考照片`,
-  }))
   const groupPhotos = clothingPhotoGroups[group] ?? clothingPhotoGroups.casual
-  return getUniquePhotos([...brandPhotos, ...groupPhotos, ...allClothingPhotos])
+  const brandOffset = getStableIndex(brandId, groupPhotos.length)
+
+  return getUniquePhotos([...groupPhotos.slice(brandOffset), ...groupPhotos.slice(0, brandOffset)])
 }
 
 function getPiecePhotoKey(brandId: BrandId, variantLabel: string, piece: string, index: number) {
