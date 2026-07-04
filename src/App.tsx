@@ -648,7 +648,7 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <a className="brand-mark" href="#today">
-          <img className="logo-mark" src="/logo.svg" alt="" />
+          <img className="logo-mark" src={`${import.meta.env.BASE_URL}logo.svg`} alt="" />
           <span>今天穿什么</span>
         </a>
         <nav className="top-actions" aria-label="页面导航">
