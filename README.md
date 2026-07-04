@@ -106,7 +106,7 @@ npm run preview
 .github/workflows/deploy.yml
 ```
 
-之后每次提交并推送到 `main` 分支，GitHub 会自动运行 `npm ci`、`npm run build`，并发布 `dist` 目录。
+之后每次提交并推送到 `main` 分支，GitHub 会自动运行 `npm ci`、`npm run build`，并把 `dist` 目录发布到 `gh-pages` 分支。
 
 `vite.config.ts` 已经设置 `base: './'`，因此同一份 `dist` 也可以部署到 Netlify、Vercel、Cloudflare Pages 等免费静态站点平台。
 
