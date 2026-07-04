@@ -28,8 +28,19 @@ import styleBoard from './assets/style-board.png'
 import casualBasicsPhoto from './assets/clothing/casual-basics.jpg'
 import crossbodyBagPhoto from './assets/clothing/crossbody-bag.jpg'
 import denimJacketPhoto from './assets/clothing/denim-jacket.jpg'
+import denimFlowerJeansPhoto from './assets/clothing/denim-flower-jeans.jpg'
 import dressShoesSuitPhoto from './assets/clothing/dress-shoes-suit.jpg'
 import knitDenimSneakersPhoto from './assets/clothing/knit-denim-sneakers.jpg'
+import outfitBlackShirtSneakersPhoto from './assets/clothing/outfit-black-shirt-sneakers.jpg'
+import outfitBlazerJeansShoesPhoto from './assets/clothing/outfit-blazer-jeans-shoes.jpg'
+import outfitConverseDenimPhoto from './assets/clothing/outfit-converse-denim.jpg'
+import outfitSuitBrownShoesPhoto from './assets/clothing/outfit-suit-brown-shoes.jpg'
+import outfitTravelHatSandalsPhoto from './assets/clothing/outfit-travel-hat-sandals.jpg'
+import outfitWomensAssortedPhoto from './assets/clothing/outfit-womens-assorted.jpg'
+import shoesColorWallPhoto from './assets/clothing/shoes-color-wall.jpg'
+import shoesNewBalanceBoxPhoto from './assets/clothing/shoes-new-balance-box.jpg'
+import shoesRetailWallPhoto from './assets/clothing/shoes-retail-wall.jpg'
+import shoesRocksAutumnPhoto from './assets/clothing/shoes-rocks-autumn.jpg'
 import smartCasualShirtPhoto from './assets/clothing/smart-casual-shirt.jpg'
 import smartSweaterLoafersPhoto from './assets/clothing/smart-sweater-loafers.jpg'
 import sportKitPhoto from './assets/clothing/sport-kit.jpg'
@@ -287,16 +298,71 @@ const outfitVisuals: Record<Occasion, string> = {
   outdoor: outfitOutdoor,
 }
 
-const clothingPhotos: Record<string, ClothingPhoto> = {
-  outer: { src: denimJacketPhoto, label: '外套参考照片' },
-  top: { src: smartCasualShirtPhoto, label: '上衣参考照片' },
-  knit: { src: smartSweaterLoafersPhoto, label: '针织层参考照片' },
-  pants: { src: knitDenimSneakersPhoto, label: '裤装参考照片' },
-  shoes: { src: dressShoesSuitPhoto, label: '鞋履参考照片' },
-  sport: { src: sportKitPhoto, label: '运动单品参考照片' },
-  bag: { src: crossbodyBagPhoto, label: '包袋配饰参考照片' },
-  casual: { src: casualBasicsPhoto, label: '休闲基础款参考照片' },
-}
+const clothingPhotoGroups = {
+  outer: [
+    { src: denimJacketPhoto, label: '外套参考照片' },
+    { src: outfitBlazerJeansShoesPhoto, label: '西装外套参考照片' },
+    { src: outfitTravelHatSandalsPhoto, label: '户外外层参考照片' },
+  ],
+  top: [
+    { src: smartCasualShirtPhoto, label: '衬衫参考照片' },
+    { src: casualBasicsPhoto, label: '基础上衣参考照片' },
+    { src: outfitBlackShirtSneakersPhoto, label: '运动上衣参考照片' },
+  ],
+  knit: [
+    { src: smartSweaterLoafersPhoto, label: '针织层参考照片' },
+    { src: outfitBlackShirtSneakersPhoto, label: '卫衣层参考照片' },
+    { src: outfitWomensAssortedPhoto, label: '轻外搭参考照片' },
+  ],
+  pants: [
+    { src: knitDenimSneakersPhoto, label: '裤装参考照片' },
+    { src: denimFlowerJeansPhoto, label: '牛仔裤参考照片' },
+    { src: outfitConverseDenimPhoto, label: '休闲裤装参考照片' },
+  ],
+  shoes: [
+    { src: dressShoesSuitPhoto, label: '皮鞋参考照片' },
+    { src: shoesColorWallPhoto, label: '运动鞋参考照片' },
+    { src: shoesNewBalanceBoxPhoto, label: '复古跑鞋参考照片' },
+    { src: shoesRetailWallPhoto, label: '鞋履陈列参考照片' },
+    { src: shoesRocksAutumnPhoto, label: '户外鞋参考照片' },
+  ],
+  sport: [
+    { src: sportKitPhoto, label: '运动装备参考照片' },
+    { src: outfitBlackShirtSneakersPhoto, label: '训练装备参考照片' },
+    { src: shoesRetailWallPhoto, label: '运动鞋参考照片' },
+  ],
+  bag: [
+    { src: crossbodyBagPhoto, label: '包袋参考照片' },
+    { src: outfitTravelHatSandalsPhoto, label: '出行配饰参考照片' },
+    { src: outfitTravelHatSandalsPhoto, label: '夏日配饰参考照片' },
+  ],
+  casual: [
+    { src: casualBasicsPhoto, label: '休闲基础款参考照片' },
+    { src: outfitConverseDenimPhoto, label: '街头休闲参考照片' },
+    { src: outfitWomensAssortedPhoto, label: '日常搭配参考照片' },
+  ],
+} satisfies Record<string, ClothingPhoto[]>
+
+const brandPhotoGroups = {
+  nike: [sportKitPhoto, shoesColorWallPhoto, outfitBlackShirtSneakersPhoto, shoesRetailWallPhoto],
+  adidas: [outfitConverseDenimPhoto, shoesColorWallPhoto, sportKitPhoto, outfitBlackShirtSneakersPhoto],
+  uniqlo: [smartCasualShirtPhoto, casualBasicsPhoto, smartSweaterLoafersPhoto, outfitWomensAssortedPhoto],
+  zara: [outfitBlazerJeansShoesPhoto, outfitSuitBrownShoesPhoto, dressShoesSuitPhoto, smartSweaterLoafersPhoto],
+  hm: [outfitWomensAssortedPhoto, denimFlowerJeansPhoto, casualBasicsPhoto, crossbodyBagPhoto],
+  thenorthface: [outfitTravelHatSandalsPhoto, shoesRocksAutumnPhoto, denimJacketPhoto, crossbodyBagPhoto],
+  newbalance: [shoesNewBalanceBoxPhoto, knitDenimSneakersPhoto, shoesRetailWallPhoto, outfitConverseDenimPhoto],
+  lululemon: [sportKitPhoto, outfitBlackShirtSneakersPhoto, crossbodyBagPhoto, smartCasualShirtPhoto],
+  arcteryx: [outfitTravelHatSandalsPhoto, shoesRocksAutumnPhoto, denimJacketPhoto, outfitBlackShirtSneakersPhoto],
+  underarmour: [sportKitPhoto, outfitBlackShirtSneakersPhoto, shoesColorWallPhoto, shoesRetailWallPhoto],
+  smart: [casualBasicsPhoto, smartCasualShirtPhoto, knitDenimSneakersPhoto, crossbodyBagPhoto],
+} satisfies Record<BrandId, string[]>
+
+const allClothingPhotos = [
+  ...Object.values(clothingPhotoGroups).flat(),
+  ...Object.values(brandPhotoGroups)
+    .flat()
+    .map((src) => ({ src, label: '服装单品参考照片' })),
+]
 
 const variantLabels = ['首选方案', '轻松替换', '天气备选']
 
@@ -660,46 +726,106 @@ function getLocationErrorMessage(error: GeolocationPositionError) {
   return '自动天气获取失败，已保留手动天气设置。'
 }
 
-function getPiecePhoto(piece: string, index: number) {
+function getPiecePhotoGroup(piece: string) {
   const normalizedPiece = piece.toLowerCase()
 
   if (/鞋|靴|sneaker|samba|gazelle|loafers/.test(normalizedPiece)) {
-    return clothingPhotos.shoes
+    return 'shoes'
   }
 
   if (/包|斜挎|腰包|背包|雨具|伞/.test(normalizedPiece)) {
-    return clothingPhotos.bag
+    return 'bag'
   }
 
   if (/裤|裙|short|长裤|短裤|牛仔/.test(normalizedPiece)) {
-    return clothingPhotos.pants
+    return 'pants'
   }
 
   if (/运动|训练|速干|dri-fit|heatgear|coldgear|压缩/.test(normalizedPiece)) {
-    return clothingPhotos.sport
+    return 'sport'
   }
 
   if (/针织|开衫|抓绒|毛|卫衣|sweater|fleece/.test(normalizedPiece)) {
-    return clothingPhotos.knit
+    return 'knit'
   }
 
   if (/外套|夹克|风衣|羽绒|派克|硬壳|软壳|jacket|coat|shell/.test(normalizedPiece)) {
-    return clothingPhotos.outer
+    return 'outer'
   }
 
   if (/衬衫|t |t恤|t 恤|上衣|内搭|airism|背心|短袖|长袖|shirt|tee/.test(normalizedPiece)) {
-    return clothingPhotos.top
+    return 'top'
   }
 
-  const fallbackOrder = [
-    clothingPhotos.casual,
-    clothingPhotos.top,
-    clothingPhotos.pants,
-    clothingPhotos.shoes,
-    clothingPhotos.bag,
-  ]
+  return 'casual'
+}
 
-  return fallbackOrder[index % fallbackOrder.length]
+function getStableIndex(value: string, length: number) {
+  let hash = 0
+
+  for (const char of value) {
+    hash = (hash * 31 + char.charCodeAt(0)) >>> 0
+  }
+
+  return hash % length
+}
+
+function getUniquePhotos(photos: ClothingPhoto[]) {
+  const seen = new Set<string>()
+  return photos.filter((photo) => {
+    if (seen.has(photo.src)) {
+      return false
+    }
+
+    seen.add(photo.src)
+    return true
+  })
+}
+
+function getPiecePhotoCandidates(piece: string, brandId: BrandId) {
+  const group = getPiecePhotoGroup(piece)
+  const brandPhotos = brandPhotoGroups[brandId].map((src) => ({
+    src,
+    label: `${brandId} 单品参考照片`,
+  }))
+  const groupPhotos = clothingPhotoGroups[group] ?? clothingPhotoGroups.casual
+  return getUniquePhotos([...brandPhotos, ...groupPhotos, ...allClothingPhotos])
+}
+
+function getPiecePhotoKey(brandId: BrandId, variantLabel: string, piece: string, index: number) {
+  return `${brandId}:${variantLabel}:${piece}:${index}`
+}
+
+function getPiecePhoto(piece: string, index: number, brandId: BrandId, variantLabel: string, usedPhotos?: Set<string>) {
+  const candidates = getPiecePhotoCandidates(piece, brandId)
+  const stableKey = getPiecePhotoKey(brandId, variantLabel, piece, index)
+  const startIndex = getStableIndex(stableKey, candidates.length)
+
+  for (let offset = 0; offset < candidates.length; offset += 1) {
+    const candidate = candidates[(startIndex + offset) % candidates.length]
+
+    if (!usedPhotos?.has(candidate.src)) {
+      return candidate
+    }
+  }
+
+  return candidates[startIndex]
+}
+
+function createPiecePhotoMap(outfits: Outfit[]) {
+  const usedPhotos = new Set<string>()
+  const photoMap: Record<string, ClothingPhoto> = {}
+
+  outfits.forEach((set) => {
+    set.layers.slice(0, 5).forEach((piece, index) => {
+      const key = getPiecePhotoKey(set.brand.id, set.variantLabel, piece, index)
+      const photo = getPiecePhoto(piece, index, set.brand.id, set.variantLabel, usedPhotos)
+      photoMap[key] = photo
+      usedPhotos.add(photo.src)
+    })
+  })
+
+  return photoMap
 }
 
 function App() {
@@ -732,6 +858,7 @@ function App() {
     [temperature, weather, occasion, commute, brandId, gender, seed],
   )
   const outfit = outfits[rouletteIndex % outfits.length] ?? outfits[0]
+  const piecePhotoMap = useMemo(() => createPiecePhotoMap(outfits), [outfits])
 
   const loadLocalWeather = () => {
     if (!navigator.geolocation) {
@@ -1143,7 +1270,9 @@ function App() {
                 <p>{set.mood}</p>
                 <div className="piece-list compact">
                   {set.layers.slice(0, 5).map((piece, pieceIndex) => {
-                    const piecePhoto = getPiecePhoto(piece, pieceIndex)
+                    const piecePhoto =
+                      piecePhotoMap[getPiecePhotoKey(set.brand.id, set.variantLabel, piece, pieceIndex)] ??
+                      getPiecePhoto(piece, pieceIndex, set.brand.id, set.variantLabel)
 
                     return (
                     <div className="piece-row with-photo" key={piece}>
