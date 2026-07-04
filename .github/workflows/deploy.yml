@@ -41,7 +41,7 @@ jobs:
           rm -rf /tmp/yifu-pages/*
           cp -R dist/. /tmp/yifu-pages/
           git switch --orphan gh-pages
-          git rm -rf .
+          git rm -rf . || true
           cp -R /tmp/yifu-pages/. .
           touch .nojekyll
           git add -A
