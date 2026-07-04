@@ -1,4 +1,4 @@
-import { type CSSProperties, useMemo, useState } from 'react'
+import { type CSSProperties, useEffect, useMemo, useState } from 'react'
 import {
   Briefcase,
   CloudRain,
@@ -25,6 +25,7 @@ import outfitOffice from './assets/outfit-office.png'
 import outfitOutdoor from './assets/outfit-outdoor.png'
 import outfitSport from './assets/outfit-sport.png'
 import styleBoard from './assets/style-board.png'
+import { trackEvent } from './analytics'
 import './App.css'
 
 type Weather = 'sunny' | 'cloudy' | 'rainy' | 'windy'
@@ -78,6 +79,8 @@ type Outfit = {
   variantLabel: string
   weatherTip: string
 }
+
+let hasTrackedInitialPageView = false
 
 const brands: Brand[] = [
   {
@@ -587,6 +590,15 @@ function App() {
   const [wheelRotation, setWheelRotation] = useState(0)
   const [isWheelSpinning, setIsWheelSpinning] = useState(false)
 
+  useEffect(() => {
+    if (hasTrackedInitialPageView) {
+      return
+    }
+
+    hasTrackedInitialPageView = true
+    trackEvent('page_view')
+  }, [])
+
   const outfits = useMemo(
     () => createOutfitVariants(temperature, weather, occasion, commute, brandId, gender, seed),
     [temperature, weather, occasion, commute, brandId, gender, seed],
@@ -597,6 +609,15 @@ function App() {
     if (isWheelSpinning) {
       return
     }
+
+    trackEvent('wheel_spin', {
+      temperature,
+      weather,
+      occasion,
+      commute,
+      gender,
+      brandId,
+    })
 
     const nextIndex = Math.floor(Math.random() * outfits.length)
     const segmentAngle = 360 / outfits.length
@@ -655,7 +676,15 @@ function App() {
               <span className="section-kicker">今日条件</span>
               <h2 id="controls-title">穿搭参数</h2>
             </div>
-            <button className="icon-button" type="button" title="换一套" onClick={() => setSeed((value) => value + 1)}>
+            <button
+              className="icon-button"
+              type="button"
+              title="换一套"
+              onClick={() => {
+                trackEvent('shuffle_outfit', { temperature, weather, occasion, commute, gender, brandId })
+                setSeed((value) => value + 1)
+              }}
+            >
               <RefreshCcw size={18} />
             </button>
           </div>
@@ -684,7 +713,10 @@ function App() {
                   className={gender === item.id ? 'active' : ''}
                   key={item.id}
                   type="button"
-                  onClick={() => setGender(item.id)}
+                  onClick={() => {
+                    trackEvent('filter_change', { filter: 'gender', value: item.id })
+                    setGender(item.id)
+                  }}
                 >
                   <Icon size={17} />
                   {item.label}
@@ -701,7 +733,10 @@ function App() {
                   className={weather === item.id ? 'active' : ''}
                   key={item.id}
                   type="button"
-                  onClick={() => setWeather(item.id)}
+                  onClick={() => {
+                    trackEvent('filter_change', { filter: 'weather', value: item.id })
+                    setWeather(item.id)
+                  }}
                 >
                   <Icon size={17} />
                   {item.label}
@@ -718,7 +753,10 @@ function App() {
                   className={occasion === item.id ? 'active' : ''}
                   key={item.id}
                   type="button"
-                  onClick={() => setOccasion(item.id)}
+                  onClick={() => {
+                    trackEvent('filter_change', { filter: 'occasion', value: item.id })
+                    setOccasion(item.id)
+                  }}
                 >
                   <Icon size={17} />
                   {item.label}
@@ -732,7 +770,14 @@ function App() {
               <Footprints size={18} />
               出行方式
             </span>
-            <select id="commute" value={commute} onChange={(event) => setCommute(event.target.value as Commute)}>
+            <select
+              id="commute"
+              value={commute}
+              onChange={(event) => {
+                trackEvent('filter_change', { filter: 'commute', value: event.target.value })
+                setCommute(event.target.value as Commute)
+              }}
+            >
               {commuteOptions.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.label}
@@ -747,7 +792,10 @@ function App() {
                 className={brandId === brand.id ? 'brand-choice active' : 'brand-choice'}
                 key={brand.id}
                 type="button"
-                onClick={() => setBrandId(brand.id)}
+                onClick={() => {
+                  trackEvent('filter_change', { filter: 'brand', value: brand.id })
+                  setBrandId(brand.id)
+                }}
               >
                 <span>{brand.shortName}</span>
                 <small>{brand.role}</small>
@@ -870,7 +918,17 @@ function App() {
                   ))}
                 </div>
                 <div className="outfit-card-actions">
-                  <button type="button" onClick={() => setRouletteIndex(index)}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      trackEvent('select_outfit', {
+                        index,
+                        brand: set.brand.id,
+                        variant: set.variantLabel,
+                      })
+                      setRouletteIndex(index)
+                    }}
+                  >
                     {outfit === set ? '已选中' : '选这套'}
                   </button>
                   <a className="source-link" href={set.brand.source} target="_blank" rel="noreferrer">

@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 vite-dev.err
+data/*.jsonl
+data/*.ndjson
+data/*.json
+data/*.md
+!data/.gitkeep
 
 # Editor directories and files
 .vscode/*
