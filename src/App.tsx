@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { type CSSProperties, useMemo, useState } from 'react'
 import {
   Briefcase,
   CloudRain,
@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Footprints,
   Layers,
+  Mars,
   Mountain,
   Palette,
   RefreshCcw,
@@ -16,6 +17,7 @@ import {
   Sun,
   Thermometer,
   Umbrella,
+  Venus,
   Wind,
 } from 'lucide-react'
 import outfitDate from './assets/outfit-date.png'
@@ -28,6 +30,7 @@ import './App.css'
 type Weather = 'sunny' | 'cloudy' | 'rainy' | 'windy'
 type Occasion = 'work' | 'campus' | 'date' | 'sport' | 'outdoor'
 type Commute = 'walk' | 'transit' | 'bike' | 'drive'
+type Gender = 'men' | 'women'
 type BrandId =
   | 'smart'
   | 'nike'
@@ -53,6 +56,14 @@ type Brand = {
   source: string
 }
 
+type OutfitLogo = {
+  initials: string
+  name: string
+  caption: string
+  color: string
+  accent: string
+}
+
 type Outfit = {
   headline: string
   mood: string
@@ -63,6 +74,7 @@ type Outfit = {
   palette: string[]
   brand: Brand
   visual: string
+  logo: OutfitLogo
   variantLabel: string
   weatherTip: string
 }
@@ -198,6 +210,11 @@ const weatherOptions: Array<{ id: Weather; label: string; icon: typeof Sun }> = 
   { id: 'windy', label: '风大', icon: Wind },
 ]
 
+const genderOptions: Array<{ id: Gender; label: string; icon: typeof Mars }> = [
+  { id: 'men', label: '男士', icon: Mars },
+  { id: 'women', label: '女士', icon: Venus },
+]
+
 const occasionOptions: Array<{
   id: Occasion
   label: string
@@ -233,6 +250,30 @@ const outfitVisuals: Record<Occasion, string> = {
 }
 
 const variantLabels = ['首选方案', '轻松替换', '天气备选']
+
+const outfitLogos: OutfitLogo[] = [
+  {
+    initials: 'CT',
+    name: 'City Tilt',
+    caption: '都市通勤徽标',
+    color: '#203A5F',
+    accent: '#E6B94F',
+  },
+  {
+    initials: 'MV',
+    name: 'Move Lab',
+    caption: '运动机能徽标',
+    color: '#E9694D',
+    accent: '#203A5F',
+  },
+  {
+    initials: 'TR',
+    name: 'Trail Ready',
+    caption: '户外防护徽标',
+    color: '#789487',
+    accent: '#E9694D',
+  },
+]
 
 function pickBrand(
   selectedBrand: BrandId,
@@ -307,7 +348,96 @@ function getTemperatureLayers(temperature: number) {
   }
 }
 
-function getWeatherTip(weather: Weather) {
+function getGenderLabel(gender: Gender) {
+  return gender === 'men' ? '男士' : '女士'
+}
+
+function getGenderPieces(gender: Gender, temperature: number, occasion: Occasion, brand: Brand, seed: number) {
+  const brandPiece = brand.pieces[Math.abs(seed) % brand.pieces.length]
+
+  if (gender === 'men') {
+    if (temperature <= 5) {
+      return ['高领保暖内搭', '羊毛衫 / 抓绒中层', '派克大衣 / 羽绒服', '直筒厚长裤', brandPiece]
+    }
+
+    if (temperature <= 14) {
+      return ['长袖 T / 牛津纺衬衫', '针织衫或连帽卫衣', '短夹克 / 风衣', '直筒休闲裤', brandPiece]
+    }
+
+    if (temperature <= 23) {
+      return ['干净白 T / 开领衬衫', occasion === 'work' ? '轻薄西装外套' : '教练夹克', '牛仔裤 / 工装裤', '低帮运动鞋', brandPiece]
+    }
+
+    if (temperature <= 30) {
+      return ['速干 T / 宽松衬衫', '薄长裤 / 百慕大短裤', '透气运动鞋', '棒球帽', brandPiece]
+    }
+
+    return ['速干短袖', '轻薄短裤', '网面鞋 / 凉鞋', '墨镜', brandPiece]
+  }
+
+  if (temperature <= 5) {
+    return ['发热内搭 / 高领针织', '羊毛开衫或抓绒中层', '长款羽绒服 / 羊毛大衣', '厚阔腿裤 / 加绒半裙', brandPiece]
+  }
+
+  if (temperature <= 14) {
+    return ['贴身长袖 / 衬衫', '针织开衫或短卫衣', '短外套 / 风衣', '直筒裤 / 中长半裙', brandPiece]
+  }
+
+  if (temperature <= 23) {
+    return ['T 恤 / 轻薄衬衫', occasion === 'date' ? '短开衫 / 小香风外套' : '薄开衫 / 教练夹克', '阔腿裤 / 牛仔裙', '低帮鞋 / 乐福鞋', brandPiece]
+  }
+
+  if (temperature <= 30) {
+    return ['凉感 T / 宽松衬衫', '薄阔腿裤 / 百慕大短裤', '透气运动鞋 / 凉鞋', '防晒帽', brandPiece]
+  }
+
+  return ['AIRism / 速干短袖', '薄半裙 / 短裤', '凉感袜', '网面鞋 / 凉鞋', brandPiece]
+}
+
+function getGenderOccasionTip(gender: Gender, occasion: Occasion) {
+  const tips: Record<Gender, Record<Occasion, string>> = {
+    men: {
+      work: '男士上班场景建议保持肩线、领口和鞋面干净，整体会更利落。',
+      campus: '男士校园穿搭可以把背包和鞋作为重点，耐走和耐脏优先。',
+      date: '男士约会保留一个质感亮点，比如外套面料、腕表或干净鞋型。',
+      sport: '男士运动日减少厚重层次，优先速干和活动空间。',
+      outdoor: '男士户外搭配注意裤脚、包带和外套下摆的稳定性。',
+    },
+    women: {
+      work: '女士上班场景建议兼顾线条和舒适度，外套、鞋跟高度和包容量要匹配日程。',
+      campus: '女士校园穿搭可以保留颜色亮点，但鞋底和包重更影响一整天体验。',
+      date: '女士约会可以突出一个视觉重点，比如短外套、半裙线条或耳饰。',
+      sport: '女士运动日优先支撑、透气和可替换外层，避免配饰影响活动。',
+      outdoor: '女士户外搭配注意防晒、防风和发型固定，收纳位也要留够。',
+    },
+  }
+
+  return tips[gender][occasion]
+}
+
+function getWeatherTip(weather: Weather, temperature: number, occasion: Occasion) {
+  if (weather === 'sunny' && temperature >= 30) {
+    return occasion === 'sport'
+      ? '晴天高温运动，速干上衣、轻薄帽子和补水瓶要一起带。'
+      : '晴天高温，防晒、浅色外层和透气鞋会比多叠穿更重要。'
+  }
+
+  if (weather === 'rainy') {
+    return occasion === 'work'
+      ? '雨天通勤，外层防泼水、鞋底防滑，进办公室后也要保持利落。'
+      : '雨天出门，把伞、防滑鞋和不怕湿的外层放在优先级第一位。'
+  }
+
+  if (weather === 'windy') {
+    return occasion === 'outdoor'
+      ? '风大户外，外套下摆、帽檐和包带都要能固定。'
+      : '风大时少选轻飘长外搭，短夹克或有抽绳的外层更稳。'
+  }
+
+  if (temperature <= 10) {
+    return '低温天气别只看外套，颈部、脚踝和手部保暖也要补上。'
+  }
+
   const tips: Record<Weather, string> = {
     sunny: '加一件防晒单品，浅色和透气面料会更舒服。',
     cloudy: '保持一层可脱外套，室内外温差更好处理。',
@@ -315,6 +445,35 @@ function getWeatherTip(weather: Weather) {
     windy: '外套下摆和帽檐要稳，避免太轻飘的长外搭。',
   }
   return tips[weather]
+}
+
+function getEnvironmentEssential(temperature: number, weather: Weather, occasion: Occasion, gender: Gender) {
+  const occasionFocus: Record<Occasion, string> = {
+    work: '上班场景要保持领口和裤线干净，避免看起来太随意。',
+    campus: '校园日程走动多，背包、鞋底和外套收纳都要轻便。',
+    date: '约会可以留一个颜色或材质亮点，但配饰不要堆太满。',
+    sport: '运动日优先排汗和活动幅度，减少厚重配饰。',
+    outdoor: '户外场景先看防风、防雨和收纳，再考虑造型层次。',
+  }
+  const genderTip = getGenderOccasionTip(gender, occasion)
+
+  if (weather === 'rainy') {
+    return `${getGenderLabel(gender)} · ${temperature}°C 雨天：外层和鞋子先选防水防滑，${occasionFocus[occasion]} ${genderTip}`
+  }
+
+  if (weather === 'windy') {
+    return `${getGenderLabel(gender)} · ${temperature}°C 风大：外套、帽子和裤脚要固定，${occasionFocus[occasion]} ${genderTip}`
+  }
+
+  if (temperature >= 30) {
+    return `${getGenderLabel(gender)} · ${temperature}°C 高温：少层次、重透气，${occasionFocus[occasion]} ${genderTip}`
+  }
+
+  if (temperature <= 10) {
+    return `${getGenderLabel(gender)} · ${temperature}°C 低温：内搭保暖和外层挡风都要到位，${occasionFocus[occasion]} ${genderTip}`
+  }
+
+  return `${getGenderLabel(gender)} · ${temperature}°C ${weather === 'sunny' ? '晴天' : '多云'}：保留一层可脱外套，${occasionFocus[occasion]} ${genderTip}`
 }
 
 function getOccasionNotes(occasion: Occasion, brand: Brand) {
@@ -329,15 +488,34 @@ function getOccasionNotes(occasion: Occasion, brand: Brand) {
   return [...notes[occasion], `${brand.shortName}：${brand.pieces[0]} 可以当主视觉单品`]
 }
 
-function getCommuteEssential(commute: Commute) {
-  const essentials: Record<Commute, string> = {
-    walk: '今天步行多，鞋底缓震和袜子透气度优先。',
-    transit: '地铁公交温差明显，外套最好能单手脱穿。',
-    bike: '骑行时选防风外层，裤脚和包带要固定。',
-    drive: '开车不用过度堆叠，外套选择轻便不压座椅的版型。',
+function getCommuteEssential(commute: Commute, weather: Weather, temperature: number, occasion: Occasion, gender: Gender) {
+  const commuteBase: Record<Commute, string> = {
+    walk: '步行多：鞋底缓震、袜子透气，裤脚不要拖地。',
+    transit: '地铁公交：外套要方便单手脱穿，包里留出收纳位。',
+    bike: '骑行：防风外层、固定裤脚和斜挎包带会更省心。',
+    drive: '开车：外套别太臃肿，坐下后肩背和腰部要舒服。',
   }
 
-  return essentials[commute]
+  const weatherAddOn: Record<Weather, string> = {
+    sunny: temperature >= 28 ? '太阳强时加墨镜或帽子。' : '晴天可以把鞋包颜色做得轻一点。',
+    cloudy: temperature <= 16 ? '多云偏凉时带薄外套。' : '多云天保持一层可拆层就够。',
+    rainy: '雨天要优先防滑鞋底和可折叠雨具。',
+    windy: '风大时包带、帽檐、外套下摆都要稳。',
+  }
+
+  const occasionAddOn: Record<Occasion, string> = {
+    work: '进办公室前能快速整理仪容最重要。',
+    campus: '课间移动多，背负重量别太高。',
+    date: '到达后保持衣服不皱，比堆单品更加分。',
+    sport: '运动后预留换洗或除味空间。',
+    outdoor: '路线长的话，水、纸巾和备用袜优先级很高。',
+  }
+  const genderAddOn: Record<Gender, string> = {
+    men: '男士注意鞋面、裤脚和外套肩线，通勤后更容易保持精神。',
+    women: '女士注意鞋跟高度、包重和外套长度，走动多时舒适度更稳。',
+  }
+
+  return `${commuteBase[commute]} ${weatherAddOn[weather]} ${occasionAddOn[occasion]} ${genderAddOn[gender]}`
 }
 
 function createOutfit(
@@ -346,6 +524,7 @@ function createOutfit(
   occasion: Occasion,
   commute: Commute,
   selectedBrand: BrandId,
+  gender: Gender,
   seed: number,
   variantIndex = 0,
   visualOccasion: Occasion = occasion,
@@ -353,28 +532,26 @@ function createOutfit(
   const brand = pickBrand(selectedBrand, weather, occasion, temperature)
   const temperatureLook = getTemperatureLayers(temperature)
   const paletteIndex = Math.abs(seed + variantIndex + temperature + brand.name.length) % paletteNames.length
+  const genderPieces = getGenderPieces(gender, temperature, occasion, brand, seed + variantIndex)
   const essentials = [
-    getCommuteEssential(commute),
-    getWeatherTip(weather),
+    getEnvironmentEssential(temperature, weather, occasion, gender),
+    getCommuteEssential(commute, weather, temperature, occasion, gender),
     `${brand.shortName} 品牌方向：${brand.signature}`,
   ]
 
   return {
     headline: temperatureLook.headline,
     mood: temperatureLook.mood,
-    layers: [
-      ...temperatureLook.layers.slice(0, 3),
-      brand.pieces[(seed + variantIndex + 1) % brand.pieces.length],
-      brand.pieces[(seed + variantIndex + 2) % brand.pieces.length],
-    ],
+    layers: genderPieces,
     essentials,
-    reason: getOccasionNotes(occasion, brand).join('；'),
+    reason: `${getOccasionNotes(occasion, brand).join('；')}；${getGenderOccasionTip(gender, occasion)}`,
     paletteName: paletteNames[paletteIndex],
     palette: brand.palette,
     brand,
     visual: outfitVisuals[visualOccasion],
+    logo: outfitLogos[variantIndex % outfitLogos.length],
     variantLabel: variantLabels[variantIndex % variantLabels.length],
-    weatherTip: getWeatherTip(weather),
+    weatherTip: getWeatherTip(weather, temperature, occasion),
   }
 }
 
@@ -384,6 +561,7 @@ function createOutfitVariants(
   occasion: Occasion,
   commute: Commute,
   selectedBrand: BrandId,
+  gender: Gender,
   seed: number,
 ) {
   const weatherSafeBrand: BrandId = weather === 'rainy' || weather === 'windy' ? 'thenorthface' : 'uniqlo'
@@ -391,9 +569,9 @@ function createOutfitVariants(
   const alternateOccasion: Occasion = occasion === 'work' ? 'campus' : occasion === 'outdoor' ? 'sport' : 'work'
 
   return [
-    createOutfit(temperature, weather, occasion, commute, selectedBrand, seed, 0, occasion),
-    createOutfit(temperature, weather, alternateOccasion, commute, activeBrand, seed + 3, 1, alternateOccasion),
-    createOutfit(temperature, weather, weather === 'rainy' || weather === 'windy' ? 'outdoor' : occasion, commute, weatherSafeBrand, seed + 6, 2, weather === 'rainy' || weather === 'windy' ? 'outdoor' : occasion),
+    createOutfit(temperature, weather, occasion, commute, selectedBrand, gender, seed, 0, occasion),
+    createOutfit(temperature, weather, alternateOccasion, commute, activeBrand, gender, seed + 3, 1, alternateOccasion),
+    createOutfit(temperature, weather, weather === 'rainy' || weather === 'windy' ? 'outdoor' : occasion, commute, weatherSafeBrand, gender, seed + 6, 2, weather === 'rainy' || weather === 'windy' ? 'outdoor' : occasion),
   ]
 }
 
@@ -402,14 +580,42 @@ function App() {
   const [weather, setWeather] = useState<Weather>('cloudy')
   const [occasion, setOccasion] = useState<Occasion>('work')
   const [commute, setCommute] = useState<Commute>('transit')
+  const [gender, setGender] = useState<Gender>('men')
   const [brandId, setBrandId] = useState<BrandId>('smart')
   const [seed, setSeed] = useState(2)
+  const [rouletteIndex, setRouletteIndex] = useState(0)
+  const [wheelRotation, setWheelRotation] = useState(0)
+  const [isWheelSpinning, setIsWheelSpinning] = useState(false)
 
   const outfits = useMemo(
-    () => createOutfitVariants(temperature, weather, occasion, commute, brandId, seed),
-    [temperature, weather, occasion, commute, brandId, seed],
+    () => createOutfitVariants(temperature, weather, occasion, commute, brandId, gender, seed),
+    [temperature, weather, occasion, commute, brandId, gender, seed],
   )
-  const outfit = outfits[0]
+  const outfit = outfits[rouletteIndex % outfits.length] ?? outfits[0]
+
+  const spinWheel = () => {
+    if (isWheelSpinning) {
+      return
+    }
+
+    const nextIndex = Math.floor(Math.random() * outfits.length)
+    const segmentAngle = 360 / outfits.length
+    const targetAngle = nextIndex * segmentAngle + segmentAngle / 2
+
+    setIsWheelSpinning(true)
+    setWheelRotation((currentRotation) => {
+      const normalizedRotation = ((currentRotation % 360) + 360) % 360
+      const desiredRotation = (360 - targetAngle) % 360
+      const correction = (desiredRotation - normalizedRotation + 360) % 360
+      const extraTurns = 4 + Math.floor(Math.random() * 3)
+      return currentRotation + extraTurns * 360 + correction
+    })
+
+    window.setTimeout(() => {
+      setRouletteIndex(nextIndex)
+      setIsWheelSpinning(false)
+    }, 1900)
+  }
 
   const today = new Intl.DateTimeFormat('zh-CN', {
     month: 'long',
@@ -421,7 +627,7 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <a className="brand-mark" href="#today">
-          <span className="mark-dot"></span>
+          <img className="logo-mark" src="/logo.svg" alt="" />
           <span>今天穿什么</span>
         </a>
         <nav className="top-actions" aria-label="页面导航">
@@ -469,6 +675,23 @@ function App() {
             value={temperature}
             onChange={(event) => setTemperature(Number(event.target.value))}
           />
+
+          <div className="segmented gender-grid" aria-label="男女区分">
+            {genderOptions.map((item) => {
+              const Icon = item.icon
+              return (
+                <button
+                  className={gender === item.id ? 'active' : ''}
+                  key={item.id}
+                  type="button"
+                  onClick={() => setGender(item.id)}
+                >
+                  <Icon size={17} />
+                  {item.label}
+                </button>
+              )
+            })}
+          </div>
 
           <div className="segmented" aria-label="天气">
             {weatherOptions.map((item) => {
@@ -541,11 +764,92 @@ function App() {
           <p>一次给出三套可替换方案，先看整体图，再决定具体品牌和单品。</p>
         </div>
 
-        <div className="outfit-grid">
-          {outfits.map((set) => (
-            <article className="outfit-set-card" key={`${set.variantLabel}-${set.brand.id}`}>
+        <div className="random-wheel-panel">
+          <div className="wheel-stage" aria-live="polite">
+            <div className="wheel-pointer"></div>
+            <button
+              className={isWheelSpinning ? 'random-wheel spinning' : 'random-wheel'}
+              type="button"
+              onClick={spinWheel}
+              disabled={isWheelSpinning}
+              style={
+                {
+                  '--wheel-a': outfits[0]?.logo.color,
+                  '--wheel-b': outfits[1]?.logo.color,
+                  '--wheel-c': outfits[2]?.logo.color,
+                  '--wheel-rotation': `${wheelRotation}deg`,
+                } as CSSProperties
+              }
+            >
+              <span className="wheel-face">
+                {outfits.map((set, index) => (
+                  <span
+                    className="wheel-chip"
+                    key={set.logo.name}
+                    style={{ '--chip-angle': `${index * 120 + 60}deg` } as CSSProperties}
+                  >
+                    <span className="wheel-chip-mark">{set.logo.initials}</span>
+                    <span>{set.logo.name}</span>
+                  </span>
+                ))}
+              </span>
+              <span className="wheel-center">
+                <Sparkles size={20} />
+                {isWheelSpinning ? '转动中' : '抽一套'}
+              </span>
+            </button>
+          </div>
+
+          <article className="wheel-result-card">
+            <div
+              className="outfit-logo static"
+              style={
+                {
+                  '--logo-accent': outfit.logo.accent,
+                  '--logo-color': outfit.logo.color,
+                } as CSSProperties
+              }
+            >
+              <span className="outfit-logo-mark">{outfit.logo.initials}</span>
+              <span className="outfit-logo-copy">
+                <strong>{outfit.logo.name}</strong>
+                <small>{outfit.logo.caption}</small>
+              </span>
+            </div>
+            <span className="wheel-result-kicker">{outfit.variantLabel}</span>
+            <h3>{outfit.brand.shortName} · {outfit.headline}</h3>
+            <p>{outfit.mood}</p>
+            <div className="mini-swatches" aria-hidden="true">
+              {outfit.palette.map((color) => (
+                <span key={color} style={{ backgroundColor: color }} />
+              ))}
+            </div>
+          </article>
+        </div>
+
+        <div className="outfit-board" aria-label="穿搭方案对比">
+          {outfits.map((set, index) => (
+            <article
+              className={outfit === set ? 'outfit-set-card selected' : 'outfit-set-card'}
+              key={`${set.variantLabel}-${set.brand.id}`}
+            >
               <div className="outfit-image">
                 <img src={set.visual} alt={`${set.brand.name} ${set.variantLabel}穿搭图`} />
+                <div
+                  className="outfit-logo"
+                  style={
+                    {
+                      '--logo-accent': set.logo.accent,
+                      '--logo-color': set.logo.color,
+                    } as CSSProperties
+                  }
+                >
+                  <span className="outfit-logo-mark">{set.logo.initials}</span>
+                  <span className="outfit-logo-copy">
+                    <strong>{set.logo.name}</strong>
+                    <small>{set.logo.caption}</small>
+                  </span>
+                </div>
               </div>
               <div className="outfit-set-body">
                 <div className="card-title">
@@ -565,10 +869,15 @@ function App() {
                     </div>
                   ))}
                 </div>
-                <a className="source-link" href={set.brand.source} target="_blank" rel="noreferrer">
-                  查看品牌灵感
-                  <ExternalLink size={16} />
-                </a>
+                <div className="outfit-card-actions">
+                  <button type="button" onClick={() => setRouletteIndex(index)}>
+                    {outfit === set ? '已选中' : '选这套'}
+                  </button>
+                  <a className="source-link" href={set.brand.source} target="_blank" rel="noreferrer">
+                    查看品牌灵感
+                    <ExternalLink size={16} />
+                  </a>
+                </div>
               </div>
             </article>
           ))}
