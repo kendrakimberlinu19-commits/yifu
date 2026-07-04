@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Footprints,
   Layers,
+  MapPin,
   Mars,
   Mountain,
   Palette,
@@ -79,7 +80,22 @@ type Outfit = {
   weatherTip: string
 }
 
+type AutoWeatherState = {
+  status: 'idle' | 'loading' | 'success' | 'error'
+  message: string
+}
+
+type OpenMeteoCurrent = {
+  current?: {
+    temperature_2m?: number
+    weather_code?: number
+    wind_speed_10m?: number
+    time?: string
+  }
+}
+
 let hasTrackedInitialPageView = false
+let hasRequestedInitialWeather = false
 
 const brands: Brand[] = [
   {
@@ -211,6 +227,13 @@ const weatherOptions: Array<{ id: Weather; label: string; icon: typeof Sun }> = 
   { id: 'rainy', label: '雨天', icon: CloudRain },
   { id: 'windy', label: '风大', icon: Wind },
 ]
+
+const weatherLabels: Record<Weather, string> = {
+  sunny: '晴天',
+  cloudy: '多云',
+  rainy: '雨天',
+  windy: '风大',
+}
 
 const genderOptions: Array<{ id: Gender; label: string; icon: typeof Mars }> = [
   { id: 'men', label: '男士', icon: Mars },
@@ -577,6 +600,42 @@ function createOutfitVariants(
   ]
 }
 
+function clampTemperature(value: number) {
+  return Math.min(40, Math.max(-5, Math.round(value)))
+}
+
+function mapWeatherCodeToWeather(weatherCode: number, windSpeed = 0): Weather {
+  if (windSpeed >= 24) {
+    return 'windy'
+  }
+
+  if (weatherCode === 0) {
+    return 'sunny'
+  }
+
+  if ([1, 2, 3, 45, 48].includes(weatherCode)) {
+    return 'cloudy'
+  }
+
+  return 'rainy'
+}
+
+function getLocationErrorMessage(error: GeolocationPositionError) {
+  if (error.code === error.PERMISSION_DENIED) {
+    return '定位权限被拒绝，已保留手动天气设置。'
+  }
+
+  if (error.code === error.POSITION_UNAVAILABLE) {
+    return '暂时拿不到当前位置，已保留手动天气设置。'
+  }
+
+  if (error.code === error.TIMEOUT) {
+    return '定位超时，已保留手动天气设置。'
+  }
+
+  return '自动天气获取失败，已保留手动天气设置。'
+}
+
 function App() {
   const [temperature, setTemperature] = useState(24)
   const [weather, setWeather] = useState<Weather>('cloudy')
@@ -588,6 +647,10 @@ function App() {
   const [rouletteIndex, setRouletteIndex] = useState(0)
   const [wheelRotation, setWheelRotation] = useState(0)
   const [isWheelSpinning, setIsWheelSpinning] = useState(false)
+  const [autoWeather, setAutoWeather] = useState<AutoWeatherState>({
+    status: 'idle',
+    message: '正在准备自动天气。',
+  })
 
   useEffect(() => {
     if (hasTrackedInitialPageView) {
@@ -603,6 +666,98 @@ function App() {
     [temperature, weather, occasion, commute, brandId, gender, seed],
   )
   const outfit = outfits[rouletteIndex % outfits.length] ?? outfits[0]
+
+  const loadLocalWeather = () => {
+    if (!navigator.geolocation) {
+      setAutoWeather({
+        status: 'error',
+        message: '当前浏览器不支持定位，仍可手动选择天气。',
+      })
+      return
+    }
+
+    setAutoWeather({
+      status: 'loading',
+      message: '正在读取当前位置天气。',
+    })
+    trackEvent('auto_weather_start')
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude, accuracy } = position.coords
+        const params = new URLSearchParams({
+          latitude: latitude.toFixed(4),
+          longitude: longitude.toFixed(4),
+          current: 'temperature_2m,weather_code,wind_speed_10m',
+          temperature_unit: 'celsius',
+          wind_speed_unit: 'kmh',
+          timezone: 'auto',
+          forecast_days: '1',
+        })
+
+        void fetch(`https://api.open-meteo.com/v1/forecast?${params.toString()}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Weather request failed')
+            }
+
+            return response.json() as Promise<OpenMeteoCurrent>
+          })
+          .then((data) => {
+            const current = data.current
+
+            if (typeof current?.temperature_2m !== 'number' || typeof current.weather_code !== 'number') {
+              throw new Error('Weather data missing')
+            }
+
+            const nextTemperature = clampTemperature(current.temperature_2m)
+            const nextWeather = mapWeatherCodeToWeather(current.weather_code, current.wind_speed_10m)
+
+            setTemperature(nextTemperature)
+            setWeather(nextWeather)
+            setAutoWeather({
+              status: 'success',
+              message: `已使用当地天气：${nextTemperature}°C · ${weatherLabels[nextWeather]}`,
+            })
+            trackEvent('auto_weather_success', {
+              provider: 'open-meteo',
+              temperature: nextTemperature,
+              weather: nextWeather,
+              accuracy: Math.round(accuracy),
+              windSpeed: current.wind_speed_10m ?? null,
+            })
+          })
+          .catch(() => {
+            setAutoWeather({
+              status: 'error',
+              message: '天气服务暂时不可用，仍可手动选择天气。',
+            })
+            trackEvent('auto_weather_error', { reason: 'weather_fetch_failed' })
+          })
+      },
+      (error) => {
+        setAutoWeather({
+          status: 'error',
+          message: getLocationErrorMessage(error),
+        })
+        trackEvent('auto_weather_error', { reason: error.code })
+      },
+      {
+        enableHighAccuracy: false,
+        maximumAge: 10 * 60 * 1000,
+        timeout: 10000,
+      },
+    )
+  }
+
+  useEffect(() => {
+    if (hasRequestedInitialWeather) {
+      return
+    }
+
+    hasRequestedInitialWeather = true
+    loadLocalWeather()
+  }, [])
 
   const spinWheel = () => {
     if (isWheelSpinning) {
@@ -702,6 +857,19 @@ function App() {
             value={temperature}
             onChange={(event) => setTemperature(Number(event.target.value))}
           />
+
+          <div className="auto-weather-row">
+            <button
+              className="auto-weather-button"
+              type="button"
+              onClick={loadLocalWeather}
+              disabled={autoWeather.status === 'loading'}
+            >
+              <MapPin size={17} />
+              {autoWeather.status === 'loading' ? '定位天气中' : '当前位置天气'}
+            </button>
+            <p className={`auto-weather-note ${autoWeather.status}`}>{autoWeather.message}</p>
+          </div>
 
           <div className="segmented gender-grid" aria-label="男女区分">
             {genderOptions.map((item) => {

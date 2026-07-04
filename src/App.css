@@ -210,6 +210,57 @@ input[type='range'] {
   accent-color: var(--coral);
 }
 
+.auto-weather-row {
+  display: grid;
+  gap: 8px;
+}
+
+.auto-weather-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 40px;
+  border: 1px solid rgba(32, 58, 95, 0.18);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--denim);
+  font-weight: 800;
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+.auto-weather-button:hover {
+  border-color: var(--denim);
+  background: #ffffff;
+}
+
+.auto-weather-button:disabled {
+  cursor: progress;
+  opacity: 0.68;
+}
+
+.auto-weather-note {
+  min-height: 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.auto-weather-note.success {
+  color: var(--sage);
+  font-weight: 750;
+}
+
+.auto-weather-note.error {
+  color: var(--coral);
+}
+
+.auto-weather-note.loading {
+  color: var(--denim);
+}
+
 .segmented {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

@@ -11,6 +11,7 @@ https://kendrakimberlinu19-commits.github.io/yifu/
 ## 功能
 
 - 根据气温、天气、场合、通勤方式生成今日穿搭。
+- 支持浏览器定位自动读取当地气温和天气，减少手动填写。
 - 支持男士 / 女士穿搭区分，单品清单和随身提醒会同步变化。
 - 支持 Nike、adidas、UNIQLO、ZARA、H&M、The North Face、New Balance、lululemon、Arc'teryx、Under Armour 等品牌偏好。
 - 提供品牌风格库和官方页面入口。
