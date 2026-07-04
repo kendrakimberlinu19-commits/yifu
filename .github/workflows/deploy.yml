@@ -37,11 +37,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -rf /tmp/yifu-pages
           mkdir -p /tmp/yifu-pages
-          rm -rf /tmp/yifu-pages/*
           cp -R dist/. /tmp/yifu-pages/
           git switch --orphan gh-pages
-          git rm -rf . || true
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp -R /tmp/yifu-pages/. .
           touch .nojekyll
           git add -A
