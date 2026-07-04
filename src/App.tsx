@@ -12,7 +12,6 @@ import {
   Palette,
   RefreshCcw,
   Shirt,
-  ShoppingBag,
   Sparkles,
   Sun,
   Thermometer,
@@ -653,7 +652,6 @@ function App() {
         </a>
         <nav className="top-actions" aria-label="页面导航">
           <a href="#brand-lab">品牌库</a>
-          <a href="#local">本地部署</a>
         </nav>
       </header>
 
@@ -1008,23 +1006,6 @@ function App() {
                 </div>
               </article>
             ))}
-        </div>
-      </section>
-
-      <section className="local-deploy" id="local">
-        <div>
-          <span className="section-kicker">Local ready</span>
-          <h2>本地搭建和使用</h2>
-          <p>这是标准 Vite + React + TypeScript 项目，依赖安装后可开发、打包和预览。</p>
-        </div>
-        <div className="command-grid">
-          <code>npm.cmd run dev</code>
-          <code>npm.cmd run build</code>
-          <code>npm.cmd run preview</code>
-        </div>
-        <div className="local-badge">
-          <ShoppingBag size={18} />
-          <span>无需后端服务，品牌推荐逻辑全部在本地前端运行。</span>
         </div>
       </section>
     </main>

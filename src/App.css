@@ -131,8 +131,7 @@ h1 {
 .control-panel,
 .result-card,
 .outfit-set-card,
-.brand-card,
-.local-deploy {
+.brand-card {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.78);
@@ -159,7 +158,6 @@ h1 {
 
 .panel-heading h2,
 .section-head h2,
-.local-deploy h2,
 .result-card h2 {
   color: var(--ink);
   font-size: 26px;
@@ -196,8 +194,7 @@ h1 {
 
 .temperature-control span,
 .select-row span,
-.card-title span,
-.local-badge {
+.card-title span {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -772,8 +769,7 @@ select {
   max-width: 760px;
 }
 
-.section-head p,
-.local-deploy p {
+.section-head p {
   color: var(--muted);
 }
 
@@ -847,42 +843,6 @@ select {
   padding: 6px 9px;
 }
 
-.local-deploy {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 18px;
-  align-items: center;
-  padding: 24px;
-}
-
-.command-grid {
-  display: grid;
-  gap: 8px;
-  min-width: 240px;
-}
-
-code {
-  display: block;
-  border: 1px solid rgba(32, 58, 95, 0.16);
-  border-radius: 8px;
-  background: #172033;
-  color: #fff;
-  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
-  font-size: 14px;
-  padding: 10px 12px;
-}
-
-.local-badge {
-  grid-column: 1 / -1;
-  width: fit-content;
-  border-radius: 999px;
-  background: rgba(139, 169, 157, 0.18);
-  color: var(--denim);
-  padding: 8px 12px;
-  font-size: 14px;
-  font-weight: 750;
-}
-
 button,
 select,
 a,
@@ -907,8 +867,7 @@ input:focus-visible {
   .results,
   .random-wheel-panel,
   .outfit-board,
-  .brand-grid,
-  .local-deploy {
+  .brand-grid {
     grid-template-columns: 1fr;
   }
 
@@ -918,10 +877,6 @@ input:focus-visible {
 
   .results {
     padding-top: 8px;
-  }
-
-  .local-deploy {
-    align-items: start;
   }
 }
 
@@ -944,8 +899,7 @@ input:focus-visible {
   .studio-copy,
   .control-panel,
   .result-card,
-  .brand-card,
-  .local-deploy {
+  .brand-card {
     padding: 18px;
   }
 
